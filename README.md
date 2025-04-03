@@ -6,7 +6,6 @@ Create a `.env` file with the following contents
 
 ```
 OPENAI_API_KEY=<api-key-here>
-
 ```
 
 ## Getting Started
