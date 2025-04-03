@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useRef, useEffect } from 'react';
 import { Paper, Box, Typography } from '@mui/material';
 import MessageInput from './MessageInput';
@@ -11,6 +10,26 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Generate a random debt amount between $1,000 and $10,000
+  const generateDebtAmount = () => {
+    const min = 1000;
+    const max = 10000;
+    const randomAmount = Math.random() * (max - min) + min;
+    return randomAmount.toFixed(2);
+  };
+
+  // Send initial message when component mounts
+  useEffect(() => {
+    const debtAmount = generateDebtAmount();
+    const initialMessage: Message = {
+      id: Date.now(),
+      text: `Hello! Our records show that you currently owe $${debtAmount}. Are you able to resolve this debt today?`,
+      sender: 'bot',
+      timestamp: new Date().toISOString(),
+    };
+    setMessages([initialMessage]);
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -54,8 +73,7 @@ export default function ChatInterface() {
     <Paper
       elevation={3}
       sx={{
-        height: 600,
-        maxWidth: 600,
+        height: '90vh',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -65,12 +83,12 @@ export default function ChatInterface() {
       <Box
         sx={{
           p: 2,
-          borderBottom: 1,
+          borderBottom: 0,
           borderColor: 'divider',
           bgcolor: 'background.paper',
         }}
       >
-        <Typography variant="h6">Chat Assistant</Typography>
+        <Typography variant="h6">Payment Assistance</Typography>
       </Box>
 
       <MessageList messages={messages} isLoading={isLoading} />
