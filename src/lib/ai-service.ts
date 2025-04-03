@@ -4,24 +4,17 @@
  */
 
 import { generateChatResponse } from '@/app/actions/chat-actions';
-
-export interface Message {
-  id: number;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: string;
-  isError?: boolean;
-}
+import { Message } from '@/types';
 
 /**
  * Process a user message and get an AI response
  */
 export async function processUserMessage(
   userMessage: string,
+  previousMessages: Message[] = [],
 ): Promise<Message> {
   try {
-    // Call the server action
-    const response = await generateChatResponse(userMessage);
+    const response = await generateChatResponse(userMessage, previousMessages);
 
     return {
       id: Date.now(),

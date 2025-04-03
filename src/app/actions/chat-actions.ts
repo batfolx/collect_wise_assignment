@@ -1,6 +1,7 @@
 'use server';
 
 import OpenAI from 'openai';
+import { Message } from '@/types';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY as string,
@@ -57,18 +58,27 @@ const getSystemPrompt = () => {
   `;
 };
 
-/**
- * Generate a chatbot response using OpenAI
- */
-export async function generateChatResponse(message: string) {
+export async function generateChatResponse(
+  message: string,
+  previousMessages: Message[] = [],
+) {
   try {
     const systemPrompt = getSystemPrompt();
+
+    const formattedMessages = previousMessages.map((msg) => ({
+      role: msg.sender === 'user' ? ('user' as const) : ('assistant' as const),
+      content: msg.text,
+    }));
+
+    const messages = [
+      { role: 'system' as const, content: systemPrompt },
+      ...formattedMessages,
+      { role: 'user' as const, content: message },
+    ];
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: message },
-      ],
+      messages: messages,
       max_tokens: 500,
     });
 
@@ -82,54 +92,5 @@ export async function generateChatResponse(message: string) {
       success: false,
       message: "Sorry, I'm having trouble responding right now.",
     };
-  }
-}
-
-/**
- * Save chat message to database
- * This is a placeholder - implement database logic as needed
- */
-export async function saveChatMessage(
-  userId: string,
-  message: string,
-  isBot: boolean,
-) {
-  try {
-    // Database logic would go here
-    // For example with Prisma:
-    // await prisma.message.create({
-    //   data: {
-    //     content: message,
-    //     isBot,
-    //     userId
-    //   }
-    // });
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error saving message:', error);
-    return { success: false };
-  }
-}
-
-/**
- * Get chat history
- * This is a placeholder - implement database logic as needed
- */
-export async function getChatHistory(userId: string, limit: number = 50) {
-  try {
-    // Database logic would go here
-    // For example with Prisma:
-    // const messages = await prisma.message.findMany({
-    //   where: { userId },
-    //   orderBy: { createdAt: 'asc' },
-    //   take: limit
-    // });
-
-    // For now, return empty array
-    return { success: true, messages: [] };
-  } catch (error) {
-    console.error('Error fetching chat history:', error);
-    return { success: false, messages: [] };
   }
 }

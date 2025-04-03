@@ -11,7 +11,6 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Generate a random debt amount between $1,000 and $10,000
   const generateDebtAmount = () => {
     const min = 1000;
     const max = 10000;
@@ -19,7 +18,6 @@ export default function ChatInterface() {
     return randomAmount.toFixed(2);
   };
 
-  // Send initial message when component mounts
   useEffect(() => {
     const debtAmount = generateDebtAmount();
     const initialMessage: Message = {
@@ -31,7 +29,6 @@ export default function ChatInterface() {
     setMessages([initialMessage]);
   }, []);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -43,14 +40,12 @@ export default function ChatInterface() {
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
 
-    // Add user message to chat
     const userMessage = createUserMessage(text);
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
     try {
-      // Process the message using server actions
-      const botResponse = await processUserMessage(text);
+      const botResponse = await processUserMessage(text, messages);
       setMessages((prev) => [...prev, botResponse]);
     } catch (error) {
       console.error('Error in chat:', error);
